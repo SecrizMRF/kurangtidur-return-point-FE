@@ -4,7 +4,7 @@ import { authService } from './auth.service';
 
 const api = axios.create({
   // baseURL: 'http://localhost:4000/api',
-  baseURL: 'https://kurangtidur-return-point-be.vercel.app',
+  baseURL: 'https://kurangtidur-return-point-be.vercel.app/api',
   withCredentials: true,
 });
 
