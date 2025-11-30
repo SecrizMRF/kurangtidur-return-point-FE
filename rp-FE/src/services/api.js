@@ -3,7 +3,8 @@ import axios from 'axios';
 import { authService } from './auth.service';
 
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api',
+  // baseURL: 'http://localhost:4000/api',
+  baseURL: 'https://kurangtidur-return-point-be.vercel.app',
   withCredentials: true,
 });
 
