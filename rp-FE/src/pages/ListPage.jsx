@@ -37,8 +37,7 @@ function ListPage() {
       const params = { 
         type, 
         status: filters.status,
-        search: debouncedSearch,
-        sort: filters.sort
+        search: debouncedSearch
       };
       
       console.log('Fetching items with params:', params);
@@ -60,7 +59,7 @@ function ListPage() {
   };
 
   fetchItems();
-}, [type, filters.status, debouncedSearch, filters.sort]);
+}, [type, filters.status, debouncedSearch]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;

@@ -5,12 +5,23 @@ const itemService = {
   // Get all items with optional filters
   async getItems(filters = {}) {
     try {
-      const { type = 'all', status, page = 1, limit = 10 } = filters;
+      const { type = 'all', status = 'all', page = 1, limit = 10, search = '' } = filters;
+      
+      // Only include non-empty parameters that backend supports
+      const params = { type, page, limit };
+      if (status && status !== 'all') params.status = status;
+      if (search && search.trim()) params.search = search.trim();
+      
+      console.log('Service calling API with params:', params);
+      
       const response = await api.get('/items', {
-        params: { type, status, page, limit }
+        params: params
       });
+      
+      console.log('Service received response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Service error:', error);
       throw error.response?.data || { message: 'Failed to fetch items' };
     }
   },
@@ -51,6 +62,17 @@ const itemService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update item status' };
+    }
+  },
+
+  // Update an item
+  async updateItem(id, itemData) {
+    try {
+      // Temporarily send as JSON to test
+      const response = await api.put(`/items/${id}`, itemData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update item' };
     }
   },
 
