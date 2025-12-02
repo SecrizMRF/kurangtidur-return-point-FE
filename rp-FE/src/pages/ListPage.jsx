@@ -5,10 +5,18 @@ import ItemCard from '../components/ItemCard';
 import { FaSearch, FaFilter, FaPlus } from 'react-icons/fa';
 
 function ListPage() {
-  const { type } = useParams(); // 'lost' or 'found'
-  console.log('DEBUG: ListPage - URL type from useParams():', type);
-  console.log('DEBUG: ListPage - Current URL:', window.location.pathname);
-  console.log('DEBUG: ListPage - Is type undefined?', type === undefined);
+  // Get type from route - could be /lost or /found (no params in new routing)
+  const location = window.location.pathname;
+  const typeFromPath = location.includes('/found') ? 'found' : location.includes('/lost') ? 'lost' : 'all';
+  const { type: typeFromParams } = useParams();
+  
+  // Use typeFromParams if available (for generic :type route), otherwise use typeFromPath
+  const type = typeFromParams || typeFromPath;
+  
+  console.log('DEBUG: ListPage - location.pathname:', location);
+  console.log('DEBUG: ListPage - typeFromPath:', typeFromPath);
+  console.log('DEBUG: ListPage - typeFromParams:', typeFromParams);
+  console.log('DEBUG: ListPage - Final type:', type);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
