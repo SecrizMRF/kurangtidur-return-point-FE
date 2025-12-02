@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import itemService from '../services/item.service';
 import ItemCard from '../components/ItemCard';
@@ -6,28 +6,49 @@ import { FaSearch, FaFilter, FaPlus } from 'react-icons/fa';
 
 function ListPage() {
   const { type } = useParams(); // 'lost' or 'found'
+  console.log('URL type parameter:', type);
+  console.log('Current URL:', window.location.pathname);
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({
-    status: 'dicari',
+    status: 'all',
     search: '',
     sort: 'newest'
   });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search input (wait 500ms after user stops typing)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filters.search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [filters.search]);
 
   useEffect(() => {
   const fetchItems = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await itemService.getItems({ 
+      
+      const params = { 
         type, 
         status: filters.status,
-        search: filters.search,
+        search: debouncedSearch,
         sort: filters.sort
-      });
-      // Ensure we're setting an array to items
-      setItems(Array.isArray(response) ? response : response.data || []);
+      };
+      
+      console.log('Fetching items with params:', params);
+      
+      const response = await itemService.getItems(params);
+      console.log('API response:', response);
+      
+      // itemService.getItems returns the full API response object: { success, data: [...], pagination: {...} }
+      const itemsArray = response.data || [];
+      setItems(Array.isArray(itemsArray) ? itemsArray : []);
     } catch (err) {
       console.error('Error fetching items:', err);
       const errorMessage = err.message || 'Failed to load items. Please check your connection and try again.';
@@ -39,7 +60,7 @@ function ListPage() {
   };
 
   fetchItems();
-}, [type, filters]);
+}, [type, filters.status, debouncedSearch, filters.sort]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +107,7 @@ function ListPage() {
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
               <div className="rounded-md shadow">
                 <Link
-                  to={`/report-${type}`}
+                  to={`/report/${type}`}
                   className={`w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white ${type === 'lost' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} md:py-4 md:text-lg md:px-10`}
                 >
                   <FaPlus className="mr-2" />
@@ -105,20 +126,39 @@ function ListPage() {
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label htmlFor="sort" className="block text-sm font-medium text-gray-700 mb-1">
-              Sort By
-            </label>
-            <select
-              id="sort"
-              name="sort"
-              value={filters.sort}
-              onChange={handleFilterChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
+          <div className="mt-4 max-w-2xl mx-auto flex gap-4">
+            <div className="flex-1">
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                id="status"
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="dicari">Searching</option>
+                <option value="ditemukan">Found</option>
+                <option value="diclaim">Claimed</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label htmlFor="sort" className="block text-sm font-medium text-gray-700 mb-1">
+                Sort By
+              </label>
+              <select
+                id="sort"
+                name="sort"
+                value={filters.sort}
+                onChange={handleFilterChange}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -140,7 +180,7 @@ function ListPage() {
           </svg>
           <h3 className="mt-2 text-lg font-medium text-gray-900">No items found</h3>
           <p className="mt-1 text-gray-500">
-            {filters.search || filters.status !== 'dicari'
+            {filters.search || filters.status !== 'all'
               ? 'Try adjusting your search or filter criteria'
               : `No ${type} items have been reported yet.`}
           </p>
