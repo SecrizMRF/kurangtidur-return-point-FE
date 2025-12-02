@@ -3,14 +3,17 @@ import api from './api';
 
 const createFoundItem = async (formData) => {
   try {
-    const response = await api.post('/items', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    console.log('DEBUG: createFoundItem called with formData');
+    
+    // IMPORTANT: Don't set Content-Type header, let axios/browser handle it
+    // This ensures the boundary is set correctly for multipart/form-data
+    const response = await api.post('/items', formData);
+    
+    console.log('DEBUG: createFoundItem response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error in createFoundItem:', error);
+    console.error('Error response:', error.response?.data);
     throw error;
   }
 };

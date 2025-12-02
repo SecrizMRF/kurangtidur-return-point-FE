@@ -3,11 +3,13 @@ import api from './api';
 
 const createLostItem = async (formData) => {
   try {
-    const response = await api.post('/items', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    console.log('DEBUG: createLostItem called with formData');
+    
+    // IMPORTANT: Don't set Content-Type header, let axios/browser handle it
+    // This ensures the boundary is set correctly for multipart/form-data
+    const response = await api.post('/items', formData);
+    
+    console.log('DEBUG: createLostItem response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error in createLostItem:', error);
