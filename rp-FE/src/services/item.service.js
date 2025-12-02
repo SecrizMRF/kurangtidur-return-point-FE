@@ -5,14 +5,25 @@ const itemService = {
   // Get all items with optional filters
   async getItems(filters = {}) {
     try {
-      const { type = 'all', status = 'all', page = 1, limit = 10, search = '' } = filters;
+      // Extract with careful handling of undefined values
+      let { type, status, page, limit, search } = filters;
+      
+      // Set defaults only if undefined - NEVER use default in destructuring when checking undefined
+      type = type !== undefined && type !== null ? type : 'all';
+      status = status !== undefined && status !== null ? status : 'all';
+      page = page !== undefined && page !== null ? page : 1;
+      limit = limit !== undefined && limit !== null ? limit : 10;
+      search = search !== undefined && search !== null ? search : '';
+      
+      console.log('DEBUG: item.service.getItems() received filters:', filters);
+      console.log('DEBUG: item.service.getItems() after defaults - type:', type, 'status:', status);
       
       // Only include non-empty parameters that backend supports
       const params = { type, page, limit };
       if (status && status !== 'all') params.status = status;
       if (search && search.trim()) params.search = search.trim();
       
-      console.log('Service calling API with params:', params);
+      console.log('Service calling API with final params:', params);
       
       const response = await api.get('/items', {
         params: params
@@ -22,6 +33,7 @@ const itemService = {
       return response.data;
     } catch (error) {
       console.error('Service error:', error);
+      console.error('Error response data:', error.response?.data);
       throw error.response?.data || { message: 'Failed to fetch items' };
     }
   },

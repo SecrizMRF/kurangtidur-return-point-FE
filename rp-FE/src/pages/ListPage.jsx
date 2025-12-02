@@ -6,8 +6,9 @@ import { FaSearch, FaFilter, FaPlus } from 'react-icons/fa';
 
 function ListPage() {
   const { type } = useParams(); // 'lost' or 'found'
-  console.log('URL type parameter:', type);
-  console.log('Current URL:', window.location.pathname);
+  console.log('DEBUG: ListPage - URL type from useParams():', type);
+  console.log('DEBUG: ListPage - Current URL:', window.location.pathname);
+  console.log('DEBUG: ListPage - Is type undefined?', type === undefined);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,13 +35,16 @@ function ListPage() {
       setLoading(true);
       setError('');
       
+      console.log('DEBUG: useEffect - type value is:', type);
+      console.log('DEBUG: useEffect - typeof type:', typeof type);
+      
       const params = { 
-        type, 
+        type: type,  // Explicitly pass type
         status: filters.status,
         search: debouncedSearch
       };
       
-      console.log('Fetching items with params:', params);
+      console.log('DEBUG: ListPage calling itemService.getItems with params:', params);
       
       const response = await itemService.getItems(params);
       console.log('API response:', response);
