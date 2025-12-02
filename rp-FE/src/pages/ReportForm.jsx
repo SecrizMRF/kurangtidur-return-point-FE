@@ -5,6 +5,9 @@ import foundService from '../services/found.service';
 
 export default function ReportForm() {
   const { type } = useParams();
+  console.log('Current URL type:', type);
+  console.log('Current URL:', window.location.pathname);
+  
   const [form, setForm] = useState({
     name: '',
     location: '',
@@ -33,23 +36,30 @@ async function submit(e) {
   e.preventDefault();
   setError(null);
 
-  if (!form.name || !form.location) {
-    return setError('Nama dan lokasi wajib diisi');
+  if (!form.name || !form.location || !form.contact) {
+    return setError('Nama, lokasi, dan kontak wajib diisi');
   }
 
   setLoading(true);
 
   try {
     const fd = new FormData();
-    fd.append('name', form.name);
+    fd.append('title', form.name);
     fd.append('location', form.location);
-    fd.append('date', form.date || new Date().toISOString().split('T')[0]);
-    fd.append('description', form.description || '');
-    fd.append('contact', form.contact || '');
-    fd.append('type', type); // 'lost' or 'found'
+    fd.append('date', form.date ? new Date(form.date).toISOString() : new Date().toISOString());
+    fd.append('description', form.description || 'No description provided');
+    fd.append('contact_info', form.contact || 'No contact info provided');
+    fd.append('item_type', type || 'lost'); // 'lost' or 'found'
     
     if (form.photo) {
       fd.append('photo', form.photo);
+    }
+
+    // Debug: log FormData contents
+    console.log('FormData contents:');
+    console.log('Type parameter:', type);
+    for (let [key, value] of fd.entries()) {
+      console.log(key, value);
     }
 
     const svc = type === 'found' ? foundService : lostService;
@@ -131,6 +141,7 @@ async function submit(e) {
             value={form.contact}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
           />
         </div>
 

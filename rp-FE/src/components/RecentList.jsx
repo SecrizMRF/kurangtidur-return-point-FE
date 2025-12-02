@@ -13,9 +13,11 @@ export default function RecentList() {
     async function fetchLatest() {
       try {
         // fetch both found and lost and merge (backend should support limit)
-        const [found, lost] = await Promise.all([foundService.getFoundItems(), lostService.getLostItems()])
+        const [foundResponse, lostResponse] = await Promise.all([foundService.getFoundItems(), lostService.getLostItems()])
         if (!mounted) return
-        // simple merge and sort by date desc (expect date ISO string)
+        // Extract data from API responses and merge
+        const found = foundResponse.data || []
+        const lost = lostResponse.data || []
         const merged = [...found, ...lost].sort((a,b)=> new Date(b.date) - new Date(a.date)).slice(0,6)
         setItems(merged)
       } catch (e) {

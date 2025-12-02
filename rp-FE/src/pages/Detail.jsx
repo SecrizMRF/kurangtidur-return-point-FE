@@ -16,7 +16,7 @@ export default function Detail() {
   const [error, setError] = useState('');
   
   const itemType = searchParams.get('type') || 'lost';
-  const isOwner = user && item && user.id === item.userId;
+  const isOwner = user && item && (user.id === item.userId || user.role === 'admin');
 
   useEffect(() => {
     let mounted = true;
@@ -26,13 +26,13 @@ export default function Detail() {
         setLoading(true);
         setError('');
         
-        // Use the unified item service to get the item by ID and type
-        const response = await itemService.getItemById(id, { type: itemType });
+        // Use the unified item service to get the item by ID
+        const response = await itemService.getItemById(id);
         
         if (!mounted) return;
         
-        if (response) {
-          setItem(response);
+        if (response && response.data) {
+          setItem(response.data);
         } else {
           setError('Item not found');
         }

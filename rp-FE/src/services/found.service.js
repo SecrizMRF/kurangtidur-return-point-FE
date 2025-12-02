@@ -3,7 +3,11 @@ import api from './api';
 
 const createFoundItem = async (formData) => {
   try {
-    const response = await api.post('/items', formData);
+    const response = await api.post('/items', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error in createFoundItem:', error);

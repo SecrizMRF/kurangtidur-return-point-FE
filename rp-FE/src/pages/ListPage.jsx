@@ -56,10 +56,17 @@ function ListPage() {
       
       const response = await itemService.getItems(params);
       console.log('API response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response.data:', response?.data);
       
       // itemService.getItems returns the full API response object: { success, data: [...], pagination: {...} }
-      const itemsArray = response.data || [];
-      setItems(Array.isArray(itemsArray) ? itemsArray : []);
+      let itemsArray = [];
+      if (response && response.data) {
+        itemsArray = Array.isArray(response.data) ? response.data : [];
+      }
+      
+      console.log('Items array to set:', itemsArray);
+      setItems(itemsArray);
     } catch (err) {
       console.error('Error fetching items:', err);
       const errorMessage = err.message || 'Failed to load items. Please check your connection and try again.';

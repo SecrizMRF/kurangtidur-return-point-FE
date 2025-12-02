@@ -25,7 +25,7 @@ function ItemCard({ item }) {
         {item.image_url ? (
           <img
             src={item.image_url}
-            alt={item.title || 'Item image'}
+            alt={item.name || item.title || 'Item image'}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
         ) : (
@@ -47,7 +47,7 @@ function ItemCard({ item }) {
         {/* Title and Status */}
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-            {item.title || 'Untitled Item'}
+            {item.name || item.title || 'Untitled Item'}
           </h3>
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${status.bg} ${status.text}`}>
             {status.label}
