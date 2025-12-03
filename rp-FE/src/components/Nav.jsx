@@ -33,7 +33,7 @@ export default function Nav() {
             Return <span className="text-amber-500">Point</span>
         </Link>
         
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-6 p-6">
           
           <Link 
             to="/found" 
