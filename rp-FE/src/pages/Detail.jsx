@@ -154,7 +154,7 @@ export default function Detail() {
 
   return (
     // Cream background
-    <div className="min-h-screen bg-stone-50 py-10"> 
+    <div className="min-h-screen bg-amber-100 py-10"> 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Back button */}
@@ -169,7 +169,7 @@ export default function Detail() {
         </div>
 
         {/* Main content - White/Cream card with elegant shadow */}
-        <div className="bg-amber-100 rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+        <div className="bg-stone-100 rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
           
           {/* Header */}
           <div className="px-6 py-6 sm:px-8 border-b border-gray-100 bg-gray-50">
