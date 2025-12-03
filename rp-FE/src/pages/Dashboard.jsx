@@ -1,50 +1,69 @@
+// Dashboard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaBoxes, FaSearch, FaPlusCircle } from 'react-icons/fa'; // Menambahkan ikon untuk visual
 
 function Dashboard() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+    // 1. 🎯 Container Utama: Menggunakan Navy Background (bg-slate-900)
+    <div className="container mx-auto px-6 py-16 min-h-screen bg-slate-900"> 
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Found Items Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-4">Found Items</h2>
-          <p className="text-gray-600 mb-4">Manage items that have been found and reported.</p>
+      {/* Judul Halaman - Kontras dengan latar belakang Navy */}
+      <h1 className="text-5xl font-extrabold text-white mb-16 text-center tracking-tighter">
+        <span className="text-amber-500">ADMIN </span>
+        DASHBOARD
+      </h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        
+        {/* --- Card 1: Found Items (Aksen Gold) --- */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.03] transition duration-300 border-t-8 border-amber-500 flex flex-col items-start">
+          <FaBoxes className="text-4xl text-amber-500 mb-4" />
+          <h2 className="text-3xl font-bold mb-3 text-slate-900">Found Items</h2>
+          <p className="text-gray-600 mb-8 flex-grow">Manage items that have been found, verified, and reported by users.</p>
+          
           <Link 
             to="/found"
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            // Button dengan Gold accent
+            className="w-full text-center bg-amber-500 text-slate-900 font-bold px-6 py-3 rounded-xl hover:bg-amber-600 transition-colors shadow-lg mt-auto"
           >
             View Found Items
           </Link>
         </div>
 
-        {/* Lost Items Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-4">Lost Items</h2>
-          <p className="text-gray-600 mb-4">View and manage reported lost items.</p>
+        {/* --- Card 2: Lost Items (Aksen Navy) --- */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.03] transition duration-300 border-t-8 border-slate-900 flex flex-col items-start">
+          <FaSearch className="text-4xl text-slate-900 mb-4" />
+          <h2 className="text-3xl font-bold mb-3 text-slate-900">Lost Items</h2>
+          <p className="text-gray-600 mb-8 flex-grow">View, track, and manage reported items that are currently lost.</p>
+          
           <Link 
             to="/lost"
-            className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            // Button dengan Navy accent
+            className="w-full text-center bg-slate-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-lg mt-auto"
           >
             View Lost Items
           </Link>
         </div>
 
-        {/* Report New Item Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-4">Report New Item</h2>
-          <p className="text-gray-600 mb-4">Report a new found or lost item.</p>
-          <div className="flex space-x-2">
+        {/* --- Card 3: Report New Item (Navy & Gold Buttons) --- */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.03] transition duration-300 border-t-8 border-red-600 flex flex-col items-start">
+          <FaPlusCircle className="text-4xl text-red-600 mb-4" />
+          <h2 className="text-3xl font-bold mb-3 text-slate-900">Quick Report</h2>
+          <p className="text-gray-600 mb-8 flex-grow">Quickly report a new found or lost item directly.</p>
+          
+          <div className="flex space-x-4 w-full mt-auto">
             <Link 
               to="/report/found"
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+              // Button dengan Gold color
+              className="flex-1 text-center bg-amber-500 text-slate-900 font-semibold px-4 py-2.5 rounded-lg hover:bg-amber-600 transition-colors shadow-md text-sm"
             >
               Report Found
             </Link>
             <Link 
               to="/report/lost"
-              className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm"
+              // Button dengan Navy color
+              className="flex-1 text-center bg-slate-900 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-colors text-sm shadow-md"
             >
               Report Lost
             </Link>
@@ -53,11 +72,13 @@ function Dashboard() {
       </div>
 
       {/* Recent Activity Section */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-gray-600">Your recent activities will appear here.</p>
-          {/* You can map through recent activities here */}
+      <div className="mt-20">
+        {/* Sub-Title Gold text di latar Navy */}
+        <h2 className="text-4xl font-bold text-amber-500 mb-8 border-b-2 border-slate-700 pb-2">Recent Activity</h2>
+        
+        {/* Card dengan Cream background (white) */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <p className="text-gray-600 italic">No recent activities available. Check back soon!</p>
         </div>
       </div>
     </div>

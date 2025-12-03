@@ -1,18 +1,33 @@
+// NotFound.jsx
 // In src/pages/NotFound.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 function NotFound() {
   return (
-    <div className="text-center py-10">
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">404 - Page Not Found</h1>
-      <p className="text-gray-600 mb-6">The page you're looking for doesn't exist or has been moved.</p>
-      <Link 
-        to="/" 
-        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Go to Home
-      </Link>
+    // Cream background
+    <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 py-12 px-4 sm:px-6 lg:px-8">
+      
+      <div className="text-center p-10 bg-white rounded-xl shadow-xl border border-gray-100">
+        <p className="text-9xl font-extrabold text-amber-500 opacity-70 mb-4">404</p> {/* Gold accent */}
+        
+        <h1 className="text-4xl font-extrabold text-stone-700 mb-4"> {/* Navy text */}
+          Page Not Found
+        </h1>
+        
+        <p className="text-lg text-gray-600 mb-8">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        
+        {/* Go to Home Button - Gold color */}
+        <Link 
+          to="/" 
+          className="px-8 py-3 bg-amber-500 text-stone-800 font-semibold rounded-lg hover:bg-amber-600 transition-colors shadow-md"
+        >
+          Go to Home
+        </Link>
+      </div>
+      
     </div>
   );
 }

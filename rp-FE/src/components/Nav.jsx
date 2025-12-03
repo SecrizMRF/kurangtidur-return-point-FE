@@ -1,23 +1,73 @@
+// Nav.jsx
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Nav() {
   const { user, logout } = useAuth()
+  const location = useLocation();
+
+  const getLinkClasses = (path) => {
+    // Base classes for all links
+    const baseClasses = "text-md font-medium px-3 py-1.5 transition-colors";
+    
+    // Check if the current path starts with the link path (for /lost vs /lost/report)
+    const isActive = location.pathname.startsWith(path) && path !== '/';
+    
+    // Active state uses Gold accent text
+    return isActive
+      ? "bg-stone-700 text-amber-500 rounded-lg shadow-sm" // Navy background, Gold text for active state
+      : `${baseClasses} text-slate-700 hover:text-amber-500`; // Slate text, Gold on hover
+  };
+
   return (
-    <header className="bg-white shadow">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-indigo-600">Return Point</Link>
-        <nav className="flex items-center gap-4">
-          <Link to="/found" className="text-slate-700 hover:text-indigo-600">Found</Link>
-          <Link to="/lost" className="text-slate-700 hover:text-indigo-600">Lost</Link>
+    // 🎨 Perubahan 1: Header fixed di atas, dengan padding besar di atas & bawah
+    <header className="sticky top-0 z-50 bg-amber-100 py-4">
+      
+      {/* 🎨 Perubahan 2: Container Navbar BUKAN full-width (hanya max-w-4xl) 
+          dan diberi rounded penuh serta shadow yang kuat. */}
+      <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between bg-white rounded-2xl shadow-2xl border border-gray-100">
+        
+        {/* Brand Name: Navy text with a Gold accent */}
+        <Link to="/" className="text-3xl font-extrabold text-stone-700 tracking-wider">
+            Return <span className="text-amber-500">Point</span>
+        </Link>
+        
+        <nav className="flex items-center gap-6">
+          
+          <Link 
+            to="/found" 
+            className={getLinkClasses('/found')}
+          >
+            Found
+          </Link>
+          <Link 
+            to="/lost" 
+            className={getLinkClasses('/lost')}
+          >
+            Lost
+          </Link>
+          
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-slate-700">{user.username}</span>
-              <button onClick={logout} className="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
+            <div className="flex items-center gap-4 border-l pl-4 border-gray-200">
+              <span className="text-md text-stone-700 font-semibold">Hello, {user.username}</span>
+              
+              {/* Logout Button: Elevated and uses Red accent */}
+              <button 
+                onClick={logout} 
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg text-sm font-semibold"
+              >
+                Logout
+              </button>
             </div>
           ) : (
-            <Link to="/login" className="px-3 py-1 bg-indigo-600 text-white rounded">Login</Link>
+            // Login Button: Navy primary color, elevated
+            <Link 
+              to="/login" 
+              className="px-6 py-2.5 bg-stone-700 text-white rounded-xl hover:bg-stone-800 transition-colors font-semibold shadow-xl text-sm"
+            >
+              Sign in
+            </Link>
           )}
         </nav>
       </div>
