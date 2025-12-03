@@ -169,7 +169,7 @@ export default function Detail() {
         </div>
 
         {/* Main content - White/Cream card with elegant shadow */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+        <div className="bg-amber-100 rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
           
           {/* Header */}
           <div className="px-6 py-6 sm:px-8 border-b border-gray-100 bg-gray-50">
