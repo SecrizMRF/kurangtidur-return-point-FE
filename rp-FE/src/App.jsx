@@ -1,22 +1,25 @@
-// App.jsx
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Nav from './components/Nav';
+import Footer from './components/Footer';
 import AppRoutes from './AppRoutes';
 import './App.css';
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <div className="min-h-screen bg-amber-100">
-          <Nav />
-          <main className="container mx-auto px-4 py-8">
-            <AppRoutes />
-          </main>
-        </div>
-      </AuthProvider>
+      <ToastProvider> 
+        <AuthProvider>
+          <div className="app-layout">
+            <Nav />
+            <main className='main-content'>
+              <AppRoutes />
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

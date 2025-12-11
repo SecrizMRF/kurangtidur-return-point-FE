@@ -1,76 +1,95 @@
-// Nav.jsx
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FaSignOutAlt } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import ConfirmModal from './ConfirmModal';
+import '../styles/Nav.css';
 
 export default function Nav() {
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
+  const { showToast } = useToast();
   const location = useLocation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const getLinkClasses = (path) => {
-    // Base classes for all links
-    const baseClasses = "text-md font-medium px-3 py-1.5 transition-colors";
-    
-    // Check if the current path starts with the link path (for /lost vs /lost/report)
-    const isActive = location.pathname.startsWith(path) && path !== '/';
-    
-    // Active state uses Gold accent text
-    return isActive
-      ? "bg-stone-700 text-amber-500 rounded-lg shadow-sm" // Navy background, Gold text for active state
-      : `${baseClasses} text-slate-700 hover:text-amber-500`; // Slate text, Gold on hover
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    showToast('Kamu sudah berhasil logout. Sampai jumpa kembali yaa!', 'success', 'Logout Berhasil');
+    setShowLogoutModal(false);
   };
 
   return (
-    // 🎨 Perubahan 1: Header fixed di atas, dengan padding besar di atas & bawah
-    <header className="sticky top-0 z-50 bg-amber-100 py-4">
-      
-      {/* 🎨 Perubahan 2: Container Navbar BUKAN full-width (hanya max-w-4xl) 
-          dan diberi rounded penuh serta shadow yang kuat. */}
-      <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between bg-white rounded-2xl shadow-2xl border border-gray-100">
-        
-        {/* Brand Name: Navy text with a Gold accent */}
-        <Link to="/" className="text-3xl font-extrabold text-stone-700 tracking-wider">
-            Return <span className="text-amber-500">Point</span>
-        </Link>
-        
-        <nav className="flex items-center gap-6 p-6">
-          
-          <Link 
-            to="/found" 
-            className={getLinkClasses('/found')}
-          >
-            Found
-          </Link>
-          <Link 
-            to="/lost" 
-            className={getLinkClasses('/lost')}
-          >
-            Lost
+    <>
+      <div className="nav-wrapper">
+        <header className="nav-glass">
+          <Link to="/" className="nav-brand">
+            Return<span className="brand-dot">Point</span>
           </Link>
           
-          {user ? (
-            <div className="flex items-center gap-4 border-l pl-4 border-gray-200">
-              <span className="text-md text-stone-700 font-semibold">Hello, {user.username}</span>
-              
-              {/* Logout Button: Elevated and uses Red accent */}
-              <button 
-                onClick={logout} 
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg text-sm font-semibold"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            // Login Button: Navy primary color, elevated
-            <Link 
-              to="/login" 
-              className="px-6 py-2.5 bg-stone-700 text-white rounded-xl hover:bg-stone-800 transition-colors font-semibold shadow-xl text-sm"
-            >
-              Sign in
-            </Link>
-          )}
-        </nav>
+          <nav className="nav-menu">
+            {user ? (
+              <>
+                <div className="nav-links-group">
+                  <Link 
+                    to="/found" 
+                    className={`nav-link ${location.pathname.startsWith('/found') ? 'active' : ''}`}
+                  >
+                    Found Items
+                  </Link>
+                  <Link 
+                    to="/lost" 
+                    className={`nav-link ${location.pathname.startsWith('/lost') ? 'active' : ''}`}
+                  >
+                    Lost Items
+                  </Link>
+                </div>
+
+                <div className="nav-separator"></div>
+
+                <div className="user-profile">
+                  <div className="user-info">
+                    <div className="user-avatar">
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="user-name">{user.username}</span>
+                  </div>
+                  <button onClick={handleLogoutClick} className="btn-logout-icon" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="auth-group">
+                <Link to="/login" className="nav-auth-link">
+                  Sign In
+                </Link>
+                <Link to="/register" className="btn-signup-pill">
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </nav>
+        </header>
       </div>
-    </header>
-  )
+
+      <ConfirmModal 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+        title="Sign Out?"
+        message="Apakah Anda yakin ingin keluar dari akun Anda saat ini?"
+        confirmText="Logout"
+        isDanger={true}
+        icon={<FaSignOutAlt />}
+      />
+    </>
+  );
 }

@@ -1,13 +1,13 @@
-// ReportForm.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import lostService from '../services/lost.service';
-import foundService from '../services/found.service';
+import { FaMapMarkerAlt, FaBox, FaCamera } from 'react-icons/fa';
+import itemService from '../services/item.service';
+import '../styles/ReportForm.css';
 
 export default function ReportForm() {
   const { type } = useParams();
-  console.log('Current URL type:', type);
-  console.log('Current URL:', window.location.pathname);
+  const navigate = useNavigate();
+  const isLost = type === 'lost';
   
   const [form, setForm] = useState({
     name: '',
@@ -16,15 +16,30 @@ export default function ReportForm() {
     description: '',
     contact: '',
     photo: null,
+    location_photo: null,
   });
+
+  const [previews, setPreviews] = useState({
+    photo: null,
+    location_photo: null
+  });
+
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  function handleFile(e) {
+  function handleFile(e, fieldName) {
     const file = e.target.files[0];
     if (!file) return;
-    setForm(f => ({ ...f, photo: file }));
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran file terlalu besar (Maks 5MB)");
+      return;
+    }
+
+    setForm(prev => ({ ...prev, [fieldName]: file }));
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviews(prev => ({ ...prev, [fieldName]: objectUrl }));
   }
 
   function handleChange(e) {
@@ -32,17 +47,25 @@ export default function ReportForm() {
     setForm(prev => ({ ...prev, [name]: value }));
   }
 
-  /**
-   * Handles form submission, selects the correct service (lost/found),
-   * constructs FormData, and sends the request.
-   */
+  function validateForm() {
+    const missingFields = [];
+    if (!form.name.trim()) missingFields.push('Nama Barang');
+    if (!form.location.trim()) missingFields.push('Lokasi Detail');
+    if (!form.contact.trim()) missingFields.push('Kontak');
+    if (!form.date) missingFields.push('Tanggal'); 
+
+    if (missingFields.length > 0) {
+      setError(`Mohon lengkapi kolom wajib: ${missingFields.join(', ')}`);
+      return false;
+    }
+    return true;
+  }
+
   async function submit(e) {
     e.preventDefault();
     setError(null);
 
-    if (!form.name || !form.location || !form.contact) {
-      return setError('Nama, lokasi, dan kontak wajib diisi');
-    }
+    if (!validateForm()) return; 
 
     setLoading(true);
 
@@ -50,153 +73,197 @@ export default function ReportForm() {
       const fd = new FormData();
       fd.append('title', form.name);
       fd.append('location', form.location);
+      fd.append('date', new Date(form.date).toISOString());
+      fd.append('description', form.description || 'Tidak ada deskripsi tambahan.');
+      fd.append('contact_info', form.contact);
+      fd.append('type', type || 'lost');
       
-      // Use the provided date or default to the current time, formatted as ISO string
-      const reportDate = form.date 
-        ? new Date(form.date).toISOString() 
-        : new Date().toISOString();
-        
-      fd.append('date', reportDate);
-      
-      fd.append('description', form.description || 'No description provided');
-      fd.append('contact_info', form.contact); // Contact is required per validation above
-      fd.append('item_type', type || 'lost'); // 'lost' or 'found'
-      
-      if (form.photo) {
-        fd.append('photo', form.photo);
-      }
+      if (form.photo) fd.append('photo', form.photo);
+      if (form.location_photo) fd.append('location_photo', form.location_photo);
 
-      // Debug: log FormData contents
-      console.log('FormData contents:');
-      console.log('Type parameter:', type);
-      for (let [key, value] of fd.entries()) {
-        console.log(key, value);
-      }
-
-      // 🎯 Simplified Service Call Logic 🎯
-      const serviceToUse = type === 'found' ? foundService : lostService;
-      const serviceMethod = type === 'found' ? 'createFoundItem' : 'createLostItem';
-      
-      // Call the selected method on the selected service with FormData
-      await serviceToUse[serviceMethod](fd);
-      
-      navigate(`/${type}`); // Redirect to /lost or /found
+      await itemService.createItem(fd);
+      navigate(`/${type}`);
     } catch (err) {
-      console.error('Error submitting form:', err);
-      // Ensure error handling is robust
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+      console.error(err);
+      setError(err.message || 'Gagal mengirim laporan. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="bg-white rounded-2xl max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        Report {type === 'found' ? 'Found' : 'Lost'} Item
-      </h1>
-      
-      {/* Error Alert */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+    <div className="report-wrapper fade-in">
+      <div className="report-card">
+        <div className="report-header">
+          <span className={`type-badge ${isLost ? 'badge-red' : 'badge-gold'}`}>
+            {isLost ? 'Kehilangan' : 'Penemuan'}
+          </span>
+          <h1 className="report-title">Buat Laporan Baru</h1>
+          <p className="report-subtitle">
+            Isi detail di bawah ini dengan lengkap untuk membantu proses pencarian.
+          </p>
         </div>
-      )}
+        
+        {error && (
+          <div className="form-alert">
+            {error}
+          </div>
+        )}
 
-      {/* Form */}
-      <form onSubmit={submit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Item Name</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-slate-500 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
+        <form onSubmit={submit} className="report-form">
+          <div className="form-section">
+            <h3 className="section-label">Informasi Barang</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">
+                  Nama Barang <span className="required">*</span>
+                </label>
+                <div className="input-with-icon">
+                  <FaBox className="input-icon" />
+                  <input
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="form-control"
+                    placeholder="Contoh: Dompet Kulit Coklat"
+                  />
+                </div>
+              </div>
 
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Location</label>
-          <input
-            type="text"
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-slate-500 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Tanggal {isLost ? 'Hilang' : 'Ditemukan'} <span className="required">*</span>
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  className="form-control"
+                />
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={form.date}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-slate-500 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
+            <div className="form-group">
+              <label className="form-label">Deskripsi & Ciri Unik</label>
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                rows={3}
+                className="form-control"
+                placeholder="Jelaskan warna, merk, isi, atau tanda khusus lainnya..."
+              />
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Description</label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            rows={3}
-            className="mt-1 block w-full rounded-md border-slate-500 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
+          <div className="form-section">
+            <h3 className="section-label">Lokasi & Kontak</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">
+                  Lokasi Detail <span className="required">*</span>
+                </label>
+                <div className="input-with-icon">
+                  <FaMapMarkerAlt className="input-icon" />
+                  <input
+                    type="text"
+                    name="location"
+                    value={form.location}
+                    onChange={handleChange}
+                    className="form-control"
+                    placeholder="Contoh: Gedung D, Pendopo Fasilkom-Ti"
+                  />
+                </div>
+              </div>
 
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Contact</label>
-          <input
-            type="text"
-            name="contact"
-            value={form.contact}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-slate-500 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Kontak yang Bisa Dihubungi <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="contact"
+                  value={form.contact}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="No. HP / ID Line / Email"
+                />
+              </div>
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-bold text-gray-700">Photo</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFile}
-            className="mt-1 block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-md file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-amber-600 file:text-white
-                      hover:file:bg-amber-800"
-          />
-        </div>
+          <div className="form-section">
+            <h3 className="section-label">Bukti Visual (Disarankan)</h3>
+            <div className="upload-grid">
+              
+              <div className="upload-card">
+                <label className="upload-label">
+                  Foto Barang
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFile(e, 'photo')}
+                    className="hidden-input"
+                  />
+                  <div className={`upload-area ${previews.photo ? 'has-image' : ''}`}>
+                    {previews.photo ? (
+                      <img src={previews.photo} alt="Preview" className="img-preview" />
+                    ) : (
+                      <div className="upload-placeholder">
+                        <FaCamera className="upload-icon" />
+                        <span>Upload Foto Barang</span>
+                      </div>
+                    )}
+                  </div>
+                </label>
+              </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            disabled={loading}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            disabled={loading}
-          >
-            {loading ? 'Submitting...' : 'Submit'}
-          </button>
-        </div>
-      </form>
+              <div className="upload-card">
+                <label className="upload-label">
+                  Foto Lokasi Sekitar
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFile(e, 'location_photo')}
+                    className="hidden-input"
+                  />
+                  <div className={`upload-area ${previews.location_photo ? 'has-image' : ''}`}>
+                    {previews.location_photo ? (
+                      <img src={previews.location_photo} alt="Preview" className="img-preview" />
+                    ) : (
+                      <div className="upload-placeholder">
+                        <FaMapMarkerAlt className="upload-icon" />
+                        <span>Upload Foto Lokasi</span>
+                      </div>
+                    )}
+                  </div>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="btn btn-secondary"
+              disabled={loading}
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Mengirim...' : 'Kirim Laporan'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

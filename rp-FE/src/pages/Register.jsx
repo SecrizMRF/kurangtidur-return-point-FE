@@ -1,19 +1,19 @@
-// Register.jsx
-// src/pages/Register.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import '../styles/Auth.css';
 
-function Register() {
+export default function Register() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -26,11 +26,10 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
-      return setError('Passwords do not match');
+      showToast('Passwords do not match. Please check again.', 'error');
+      return;
     }
 
     setIsLoading(true);
@@ -42,137 +41,99 @@ function Register() {
       });
 
       if (result.success) {
-        // Navigate to login after successful registration
+        showToast('Your account has been created successfully.', 'success', 'Welcome Aboard!');
         navigate('/login');
       } else {
-        setError(result.error || 'Registration failed. Please try again.');
+        const errorMsg = result.error || 'Registration failed.';
+        if (errorMsg.toLowerCase().includes('email')) {
+          showToast('That email is already in use. Try logging in.', 'error');
+        } else {
+          showToast(errorMsg, 'error');
+        }
       }
     } catch (err) {
       console.error('Registration error:', err);
-      setError('An error occurred during registration. Please try again.');
+      showToast('Server error. Please try again later.', 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    // Cream background
-    <div className="min-h-screen flex items-center justify-center bg-amber-100 py-12 px-4 sm:px-6 lg:px-8">
-      
-      <div className="max-w-md w-full space-y-10 bg-white p-8 sm:p-10 rounded-xl shadow-2xl border border-gray-100">
-        
-        {/* Header Section */}
-        <div>
-          <h2 className="mt-2 text-center text-4xl font-extrabold text-stone-700"> {/* Navy text */}
-            Create a new account
-          </h2>
-          <p className="mt-4 text-center text-md text-gray-600">
-            Already have an account?{' '}
-            {/* Link to Login - Gold text */}
-            <Link to="/login" className="font-semibold text-amber-500 hover:text-amber-600 transition-colors">
-              Sign in here
-            </Link>
-          </p>
+    <div className="auth-container fade-in">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2 className="auth-title">Join Us</h2>
+          <p className="auth-subtitle">Start helping your community today.</p>
         </div>
 
-        {/* Error Alert Styling */}
-        {error && (
-          <div className="bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-lg shadow-sm">
-            
-            {/* Username Input */}
-            <div className="mb-4">
-              <label htmlFor="username" className="sr-only">Username</label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                // Modern input styling with Gold focus ring
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            
-            {/* Email Input */}
-            <div className="mb-4">
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                // Modern input styling with Gold focus ring
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            
-            {/* Password Input */}
-            <div className="mb-4">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength="6"
-                // Modern input styling with Gold focus ring
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
-                placeholder="Password (Min. 6 characters)"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            
-            {/* Confirm Password Input */}
-            <div>
-              <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength="6"
-                // Modern input styling with Gold focus ring
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </div>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              className="form-control"
+              placeholder="Choose a unique username"
+              value={formData.username}
+              onChange={handleChange}
+            />
           </div>
 
-          {/* Create Account Button */}
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              // Navy button with Gold focus ring
-              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-md font-semibold rounded-lg text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 shadow-lg transition-colors ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
-            >
-              {isLoading ? 'Creating account...' : 'Create Account'}
-            </button>
+          <div className="form-group">
+            <label className="form-label">Email Address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="form-control"
+              placeholder="name@student.university.ac.id"
+              value={formData.email}
+              onChange={handleChange}
+            />
           </div>
+
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              minLength="6"
+              className="form-control"
+              placeholder="Min. 6 characters"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              className="form-control"
+              placeholder="Retype to confirm"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-auth" disabled={isLoading}>
+            {isLoading ? 'Creating Account...' : 'Create Account'}
+          </button>
         </form>
+
+        <div className="auth-footer">
+          Already a member? <Link to="/login" className="auth-link">Sign In</Link>
+        </div>
       </div>
     </div>
   );
 }
-
-export default Register;
