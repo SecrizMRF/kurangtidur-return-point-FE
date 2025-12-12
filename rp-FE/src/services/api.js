@@ -1,3 +1,4 @@
+// src/services/api.js
 import axios from 'axios';
 import { authService } from './auth.service';
 
@@ -23,14 +24,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) 
-    {
-      const requestUrl = error.config.url || '';
-      if(!requestUrl.includes('/auth/login') && !requestUrl.includes('/auth/register'))
-      {
-        authService.logout();
-        window.location.href = '/login';
-      }
+    if (error.response?.status === 401) {
+      authService.logout();
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
