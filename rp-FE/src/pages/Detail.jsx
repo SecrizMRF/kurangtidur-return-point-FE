@@ -253,7 +253,7 @@ export default function Detail() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
                     {/* Date */}
                     <div className="flex items-start">
-                      <FaCalendarAlt className="flex-shrink-0 h-6 w-6 text-amber-500 mt-0.5" />
+                      <FaCalendarAlt className="shrink-0 h-6 w-6 text-amber-500 mt-0.5" />
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-500">Date {itemType === 'lost' ? 'Lost' : 'Found'}</p>
                         <p className="text-md font-semibold text-stone-700">{formattedDate}</p>
@@ -261,7 +261,7 @@ export default function Detail() {
                     </div>
                     {/* Location */}
                     <div className="flex items-start">
-                      <FaMapMarkerAlt className="flex-shrink-0 h-6 w-6 text-stone-700 mt-0.5" />
+                      <FaMapMarkerAlt className="shrink-0 h-6 w-6 text-stone-700 mt-0.5" />
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-500">Location</p>
                         <p className="text-md font-semibold text-stone-700">{item.location || 'Not specified'}</p>
