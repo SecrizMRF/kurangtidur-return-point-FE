@@ -52,6 +52,16 @@ export default function Nav() {
             <div className="flex items-center gap-4 border-l pl-4 border-gray-200">
               <span className="text-md text-stone-700 font-semibold">Hello, {user.username}</span>
               
+              {/* Admin Dashboard Button: Shows only for admin users */}
+              {user.role === 'admin' && (
+                <Link 
+                  to="/admin" 
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg text-sm font-semibold"
+                >
+                  Dashboard
+                </Link>
+              )}
+              
               {/* Logout Button: Elevated and uses Red accent */}
               <button 
                 onClick={logout} 
