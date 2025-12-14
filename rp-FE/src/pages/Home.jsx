@@ -16,7 +16,7 @@ export default function Home() {
           <span className="text-amber-500">Return </span>Point
         </h1>
         <p className="mt-3 max-w-xl text-lg font-light text-gray-600">
-          Cari barang hilang atau laporkan barang yang kamu temukan — cepat, mudah, dan aman.
+          Semoga yang hilang dapat kembali, dan yang menemukan dapat merasa berarti.
         </p>
 
         {/* Action Buttons */}
@@ -39,12 +39,12 @@ export default function Home() {
           </Link>
           
           {/* Lihat Barang Ditemukan - Bordered Gold/Navy */}
-          <Link 
+          {/* <Link 
             to="/found" 
             className="px-6 py-3 border border-amber-500 text-amber-500 font-semibold rounded-lg hover:bg-amber-500 hover:text-slate-900 transition-colors"
           >
             Lihat Barang Ditemukan
-          </Link>
+          </Link> */}
         </div>
       </section>
 

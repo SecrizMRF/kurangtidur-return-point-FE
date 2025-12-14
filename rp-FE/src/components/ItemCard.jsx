@@ -3,9 +3,11 @@
 import { Link } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 import { FaMapMarkerAlt, FaClock, FaEye } from 'react-icons/fa';
+import { getItemImageUrl } from '../utils/imageHelper';
 
 function ItemCard({ item }) {
   const itemType = item.type || 'lost';
+  const imageUrl = getItemImageUrl(item);
   const statusColors = {
     dicari: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Searching' }, // Gold accent for Searching
     ditemukan: { bg: 'bg-green-100', text: 'text-green-800', label: 'Found' }, 
@@ -18,18 +20,22 @@ function ItemCard({ item }) {
   const status = statusColors[item.status?.toLowerCase()] || statusColors.default;
   
   // Changed color scheme for Type Badges
-  const typeColor = itemType === 'lost' ? 'bg-red-100 text-red-800' : 'bg-stone-100 text-stone-800';
+  const typeColor = itemType === 'lost' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-stone-800';
   const typeLabel = itemType === 'lost' ? 'Lost' : 'Found';
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-200 border border-gray-100 flex flex-col h-full">
       {/* Image */}
       <div className="relative h-48 bg-gray-100 overflow-hidden">
-        {item.image_url ? (
+        {imageUrl ? (
           <img
-            src={item.image_url}
+            src={imageUrl}
             alt={item.name || item.title || 'Item image'}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              console.error('Image load error for URL:', imageUrl);
+              e.target.style.display = 'none';
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -83,9 +89,7 @@ function ItemCard({ item }) {
           <Link
             to={`/detail/${item.id}?type=${itemType}`}
             // Button styling: Red for Lost, Navy for Found. Focus ring is Gold.
-            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-md text-white ${
-              itemType === 'lost' ? 'bg-red-600 hover:bg-red-700' : 'bg-stone-700 hover:bg-stone-800'
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors`}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-md text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors`}
           >
             View Details
           </Link>

@@ -7,6 +7,7 @@ import EditForm from './pages/EditForm';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import ListPage from './pages/ListPage';
 import Detail from './pages/Detail';
 import NotFound from './pages/NotFound';
@@ -42,6 +43,7 @@ function AppRoutes() {
         <Route path="edit-lost/:id" element={<EditForm />} />
         <Route path="edit-found/:id" element={<EditForm />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="admin" element={<AdminDashboard />} />
         {/* IMPORTANT: This should match /lost and /found */}
         <Route path="lost" element={<ListPage />} />
         <Route path="found" element={<ListPage />} />

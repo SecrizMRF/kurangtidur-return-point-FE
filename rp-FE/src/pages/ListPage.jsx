@@ -91,7 +91,7 @@ function ListPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-slate-900">
+      <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-500"></div>
       </div>
     );
@@ -116,7 +116,7 @@ function ListPage() {
 
   return (
     // 1. 🎯 Container Utama: Menggunakan Navy Background
-    <div className="min-h-screen bg-slate-900"> 
+    <div className="min-h-screen bg-slate-700 rounded-2xl"> 
       
       {/* 2. Hero Section - White Card menonjol di atas Navy */}
       <div className={`py-16`}>

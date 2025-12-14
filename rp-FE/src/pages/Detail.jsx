@@ -6,6 +6,7 @@ import { FaMapMarkerAlt, FaCalendarAlt, FaUser, FaPhone, FaEdit, FaArrowLeft, Fa
 import { useAuth } from '../context/AuthContext';
 import itemService from '../services/item.service';
 import Loader from '../components/Loader';
+import { getItemImageUrl } from '../utils/imageHelper';
 
 export default function Detail() {
   const { id } = useParams();
@@ -15,6 +16,7 @@ export default function Detail() {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [imageUrl, setImageUrl] = useState(null);
   
   const itemType = searchParams.get('type') || 'lost';
   // Menggunakan || 'admin' di bawah adalah redundan karena sudah di cek di isOwner
@@ -35,6 +37,7 @@ export default function Detail() {
         
         if (response && response.data) {
           setItem(response.data);
+          setImageUrl(getItemImageUrl(response.data));
         } else {
           setError('Item not found');
         }
@@ -221,11 +224,15 @@ export default function Detail() {
               {/* Image Column */}
               <div className="lg:col-span-1">
                 <div className="aspect-w-4 aspect-h-3 bg-gray-100 rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                  {item.photo ? (
+                  {imageUrl ? (
                     <img
-                      src={item.photo}
+                      src={imageUrl}
                       alt={item.name || 'Item image'}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Image load error for URL:', imageUrl);
+                        e.target.style.display = 'none';
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
