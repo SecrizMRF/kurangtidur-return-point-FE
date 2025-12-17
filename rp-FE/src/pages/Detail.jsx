@@ -19,8 +19,8 @@ export default function Detail() {
   const [imageUrl, setImageUrl] = useState(null);
   
   const itemType = searchParams.get('type') || 'lost';
-  // Menggunakan || 'admin' di bawah adalah redundan karena sudah di cek di isOwner
-  const isOwner = user && item && (user.id === item.userId || user.role === 'admin');
+  // Check if user is the owner (reporter) or admin
+  const isOwner = user && item && (user.username === item.reporter || user.role === 'admin');
 
   useEffect(() => {
     let mounted = true;
@@ -59,10 +59,21 @@ export default function Detail() {
   }, [id, itemType]);
 
   const handleDelete = async () => {
+    if (!user) {
+      alert('Please login first to delete this item');
+      navigate('/login');
+      return;
+    }
+
+    if (!isOwner) {
+      alert('You can only delete items that you reported');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         await itemService.deleteItem(id, { type: itemType });
-        // Mengubah navigasi agar sesuai dengan rute yang diharapkan (misalnya: /found atau /lost)
+        // Navigate to list page
         navigate(`/${itemType}`); 
       } catch (err) {
         console.error('Error deleting item:', err);

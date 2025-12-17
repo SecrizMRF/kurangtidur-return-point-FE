@@ -29,10 +29,23 @@ export default function EditForm() {
         setLoading(true);
         setError('');
         
+        // Check if user is logged in
+        if (!user) {
+          setError('You must be logged in to edit items');
+          return;
+        }
+        
         const response = await itemService.getItemById(id);
         
         if (response && response.data) {
           const itemData = response.data;
+          
+          // Check if user is the reporter (owner) or admin
+          if (user.username !== itemData.reporter && user.role !== 'admin') {
+            setError('You can only edit items that you reported');
+            return;
+          }
+          
           setItem(itemData);
           
           // Pre-fill form with existing data
@@ -60,7 +73,7 @@ export default function EditForm() {
     if (id) {
       fetchItem();
     }
-  }, [id]);
+  }, [id, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -124,7 +137,7 @@ export default function EditForm() {
       <div className="max-w-4xl mx-auto p-6 bg-stone-50 min-h-screen">
         <div className="bg-red-100 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
           <div className="flex items-center">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg className="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
