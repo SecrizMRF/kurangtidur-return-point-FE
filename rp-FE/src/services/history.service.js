@@ -11,12 +11,20 @@ const historyService = {
   async getItemHistory(itemId, limit = 20, offset = 0) {
     try {
       console.log(`📖 Fetching history for item ${itemId}`);
-      const response = await api.get(`/items/${itemId}/history`, {
-        params: { limit, offset }
+      const numId = parseInt(itemId, 10);
+      const numLimit = parseInt(limit, 10);
+      const numOffset = parseInt(offset, 10);
+      
+      console.log(`📖 Query params - itemId: ${numId}, limit: ${numLimit}, offset: ${numOffset}`);
+      
+      const response = await api.get(`/items/${numId}/history`, {
+        params: { limit: numLimit, offset: numOffset }
       });
+      console.log('📖 History response:', response.data);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching item history:', error);
+      console.error('Error response:', error.response?.data);
       throw error.response?.data || { message: 'Failed to fetch history' };
     }
   },
@@ -29,13 +37,26 @@ const historyService = {
    */
   async getAllHistory(filters = {}, limit = 50, offset = 0) {
     try {
-      console.log('📖 Fetching all history');
-      const response = await api.get('/items/admin/history/all', {
-        params: { ...filters, limit, offset }
-      });
+      console.log('📖 Fetching all history with filters:', filters);
+      const numLimit = parseInt(limit, 10);
+      const numOffset = parseInt(offset, 10);
+      
+      const params = {
+        limit: numLimit,
+        offset: numOffset
+      };
+      
+      if (filters.action) params.action = filters.action;
+      if (filters.changedBy) params.changedBy = filters.changedBy;
+      
+      console.log('📖 Query params:', params);
+      
+      const response = await api.get('/items/admin/history/all', { params });
+      console.log('📖 All history response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching all history:', error);
+      console.error('Error response:', error.response?.data);
       throw error.response?.data || { message: 'Failed to fetch history' };
     }
   },
