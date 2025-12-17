@@ -80,9 +80,26 @@ const itemService = {
   // Update an item
   async updateItem(id, itemData) {
     try {
-      // Temporarily send as JSON to test
-      const response = await api.put(`/items/${id}`, itemData);
-      return response.data;
+      // If itemData is FormData or has a File object, send as multipart
+      if (itemData instanceof FormData || (itemData.photo && itemData.photo instanceof File)) {
+        const formData = new FormData();
+        Object.entries(itemData).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            formData.append(key, value);
+          }
+        });
+        
+        const response = await api.put(`/items/${id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        return response.data;
+      } else {
+        // Send as JSON for text-only updates
+        const response = await api.put(`/items/${id}`, itemData);
+        return response.data;
+      }
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update item' };
     }

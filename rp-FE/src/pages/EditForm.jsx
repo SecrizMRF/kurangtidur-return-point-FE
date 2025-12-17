@@ -105,8 +105,8 @@ export default function EditForm() {
     try {
       setLoading(true);
       
-      // Data preparation (if photo is to be handled, use FormData. Currently sends JSON)
-      const jsonData = {
+      // Build data object - include photo if user selected a new one
+      const submitData = {
         title: formData.title,
         description: formData.description,
         item_type: formData.item_type,
@@ -115,10 +115,18 @@ export default function EditForm() {
         contact_info: formData.contact_info
       };
       
-      console.log('JSON data being sent:', jsonData);
+      // Include photo if user selected a new one
+      if (formData.photo && formData.photo instanceof File) {
+        submitData.photo = formData.photo;
+        console.log('📸 Photo file included:', formData.photo.name);
+      } else {
+        console.log('📸 No new photo selected');
+      }
+      
+      console.log('Data being sent:', submitData);
 
-      // Assuming itemService.updateItem handles sending the correct payload type
-      const response = await itemService.updateItem(id, jsonData);
+      // itemService.updateItem will handle FormData conversion if needed
+      const response = await itemService.updateItem(id, submitData);
       
       // Navigate back to item details
       navigate(`/detail/${id}?type=${formData.item_type}`);
