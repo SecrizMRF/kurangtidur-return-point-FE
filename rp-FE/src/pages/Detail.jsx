@@ -15,6 +15,7 @@ export default function Detail() {
   const { user } = useAuth();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingStatusUpdate, setLoadingStatusUpdate] = useState(false);
   const [error, setError] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   
@@ -79,6 +80,36 @@ export default function Detail() {
         console.error('Error deleting item:', err);
         alert('Failed to delete item. Please try again.');
       }
+    }
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    if (!user) {
+      alert('Please login first to change status');
+      return;
+    }
+
+    if (!isOwner) {
+      alert('You can only change status for items you reported');
+      return;
+    }
+
+    try {
+      setLoadingStatusUpdate(true);
+      await itemService.updateItemStatus(id, newStatus);
+      
+      // Update local state
+      setItem(prev => ({
+        ...prev,
+        status: newStatus
+      }));
+      
+      alert('Status updated successfully!');
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Failed to update status. Please try again.');
+    } finally {
+      setLoadingStatusUpdate(false);
     }
   };
 
@@ -197,11 +228,25 @@ export default function Detail() {
                     <FaTag className="w-3 h-3 mr-1" />
                     {typeLabel}
                   </span>
-                  {/* Status Badge - Gold/Cream Colors */}
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.bg} ${status.text} border border-opacity-50`}>
-                    <FaInfoCircle className="w-3 h-3 mr-1" />
-                    {status.label}
-                  </span>
+                  
+                  {/* Status - Interactive for owner, static for others */}
+                  {isOwner ? (
+                    <select
+                      value={item.status}
+                      onChange={(e) => handleStatusChange(e.target.value)}
+                      disabled={loadingStatusUpdate}
+                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${status.bg} ${status.text} transition-all ${loadingStatusUpdate ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}`}
+                    >
+                      <option value="dicari">Searching</option>
+                      <option value="ditemukan">Found</option>
+                      <option value="diclaim">Claimed</option>
+                    </select>
+                  ) : (
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.bg} ${status.text} border border-opacity-50`}>
+                      <FaInfoCircle className="w-3 h-3 mr-1" />
+                      {status.label}
+                    </span>
+                  )}
                 </div>
               </div>
               
