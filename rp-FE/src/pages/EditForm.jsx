@@ -94,13 +94,12 @@ export default function EditForm() {
       
       // Data preparation (if photo is to be handled, use FormData. Currently sends JSON)
       const jsonData = {
-        name: formData.title, // Use 'name' if API expects it, or 'title'
+        title: formData.title,
         description: formData.description,
-        type: formData.item_type, // Use 'type' if API expects it, or 'item_type'
+        item_type: formData.item_type,
         location: formData.location,
         date: formData.date,
-        contact: formData.contact_info // Use 'contact' if API expects it, or 'contact_info'
-        // Photo upload logic needs adjustment if API supports file upload via JSON endpoint
+        contact_info: formData.contact_info
       };
       
       console.log('JSON data being sent:', jsonData);
