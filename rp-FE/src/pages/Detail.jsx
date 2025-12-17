@@ -186,7 +186,7 @@ export default function Detail() {
     // Navy & Gold/Yellow Palette
     dicari: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Searching' },
     ditemukan: { bg: 'bg-green-100', text: 'text-green-800', label: 'Found' },
-    diclaim: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Claimed' }, // Gold Accent
+    diclaim: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Claimed' }, // Gold Accent
     open: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Searching' },
     claimed: { bg: 'bg-stone-100', text: 'text-stone-800', label: 'Claimed' }, // Navy/Cream Accent
     default: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Unknown' }
