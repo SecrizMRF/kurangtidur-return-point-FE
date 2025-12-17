@@ -5,13 +5,17 @@ import { useAuth } from '../context/AuthContext';
 import itemService from '../services/item.service';
 import { getItemImageUrl } from '../utils/imageHelper';
 import Loader from '../components/Loader';
-import { FaTrashAlt, FaCheckCircle, FaCircle, FaBoxOpen, FaChartBar } from 'react-icons/fa';
+import ItemHistory from '../components/ItemHistory';
+import AllHistory from '../components/AllHistory';
+import { FaTrashAlt, FaCheckCircle, FaCircle, FaBoxOpen, FaChartBar, FaHistory } from 'react-icons/fa';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('items'); // 'items' or 'history'
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [filters, setFilters] = useState({
     type: 'all',
     status: 'all',
@@ -131,6 +135,41 @@ export default function AdminDashboard() {
           />
         </div>
 
+        {/* Tab Navigation */}
+        <div className="mb-6 border-b border-gray-300 flex gap-1">
+          <button
+            onClick={() => {
+              setActiveTab('items');
+              setSelectedItemId(null);
+            }}
+            className={`px-6 py-3 font-medium transition-colors flex items-center gap-2 ${
+              activeTab === 'items'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <FaBoxOpen size={16} />
+            Items Management
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('history');
+              setSelectedItemId(null);
+            }}
+            className={`px-6 py-3 font-medium transition-colors flex items-center gap-2 ${
+              activeTab === 'history'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <FaHistory size={16} />
+            Activity History
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'items' && (
+        <>
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -264,12 +303,15 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-      </div>
-    </div>
-  );
-}
+        </>
+        )}
 
-function StatCard({ label, value, icon }) {
+        {/* History Tab */}
+        {activeTab === 'history' && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <AllHistory />
+          </div>
+        )}
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center">
