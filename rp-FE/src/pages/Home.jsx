@@ -11,10 +11,21 @@ export default function Home() {
       {/* 2. Hero Section: White/Cream Background */}
       <section className="bg-white p-10 rounded-2xl mb-12 shadow-2xl transform hover:shadow-2xl transition duration-300">
         
-        {/* Title with Gold Accent - Teks utama sekarang Slate 900 */}
-        <h1 className="text-5xl font-extrabold tracking-tight text-slate-900">
-          <span className="text-amber-500">Return </span>Point
-        </h1>
+        {/* Title with Logo and Gold Accent */}
+        <div className="flex items-center gap-6 mb-4">
+          {/* Logo */}
+          <img 
+            src="/LOGO.png" 
+            alt="Return Point Logo" 
+            className="h-20 w-20 object-contain"
+          />
+          
+          {/* Title with Gold Accent - Teks utama sekarang Slate 900 */}
+          <h1 className="text-5xl font-extrabold tracking-tight text-slate-900">
+            <span className="text-amber-500">Return </span>Point
+          </h1>
+        </div>
+        
         <p className="mt-3 max-w-xl text-lg font-light text-gray-600">
           Semoga yang hilang dapat kembali, dan yang menemukan dapat merasa berarti.
         </p>
